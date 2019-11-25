@@ -1,6 +1,10 @@
 #include "graspit_interface.h"
 
 #include <string>
+
+#include <fstream> //TODO: JP
+#include <sstream>
+
 #include <graspit/graspitCore.h>
 #include <graspit/robot.h>
 #include <graspit/world.h>
@@ -470,12 +474,13 @@ bool GraspitInterface::setRobotDesiredDOFCB(graspit_interface::SetRobotDesiredDO
 bool GraspitInterface::importRobotCB(graspit_interface::ImportRobot::Request &request,
                        graspit_interface::ImportRobot::Response &response)
 {
-    QString filename = QString(getenv("GRASPIT"))+
-            QString("/models/robots/") +
-            QString(request.filename.data()) +
-            QString("/") +
-            QString(request.filename.data()) +
-            QString(".xml");
+    QString filename = QString(request.filename.data()); //JP edited
+//            QString(getenv("GRASPIT"))+
+//            QString("/models/robots/") +
+//            QString(request.filename.data()) +
+//            QString("/") +
+//            QString(request.filename.data()) +
+//            QString(".xml");
 
     ROS_INFO("Loading %s",filename.toStdString().c_str());
 
@@ -501,10 +506,11 @@ bool GraspitInterface::importRobotCB(graspit_interface::ImportRobot::Request &re
 bool GraspitInterface::importObstacleCB(graspit_interface::ImportObstacle::Request &request,
                    graspit_interface::ImportObstacle::Response &response)
 {
-    QString filename = QString(getenv("GRASPIT"))+
-            QString("/models/obstacles/") +
-            QString(request.filename.data()) +
-            QString(".xml");
+    QString filename = QString(request.filename.data());
+//            QString(getenv("GRASPIT"))+
+//            QString("/models/obstacles/") +
+//            QString(request.filename.data()) +
+//            QString(".xml");
 
     ROS_INFO("Loading %s", filename.toStdString().c_str());
 
@@ -535,10 +541,11 @@ bool GraspitInterface::importObstacleCB(graspit_interface::ImportObstacle::Reque
 bool GraspitInterface::importGraspableBodyCB(graspit_interface::ImportGraspableBody::Request &request,
                    graspit_interface::ImportGraspableBody::Response &response)
 {
-    QString filename = QString(getenv("GRASPIT"))+
-            QString("/models/objects/") +
-            QString(request.filename.data()) +
-            QString(".xml");
+    QString filename = QString(request.filename.data()); //JP edited
+//            QString(getenv("GRASPIT"))+
+//            QString("/models/objects/") +
+//            QString(request.filename.data()) +
+//            QString(".xml");
 
     ROS_INFO("Loading %s",filename.toStdString().c_str());
     //First try to load from Graspit Directory
@@ -947,9 +954,9 @@ void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState* gps,
 
     geometry_msgs::Pose pose;
     transf t = mHand->getTran();
-    pose.position.x = t.translation().x() / 1000.0;
-    pose.position.y = t.translation().y() / 1000.0;;
-    pose.position.z = t.translation().z() / 1000.0;;
+    pose.position.x = t.translation().x() / 10000.0; //TODO: JP edited dividi por 10
+    pose.position.y = t.translation().y() / 10000.0; //TODO: JP edited
+    pose.position.z = t.translation().z() / 10000.0; //TODO: JP edited
     pose.orientation.w = t.rotation().w();
     pose.orientation.x = t.rotation().x();
     pose.orientation.y = t.rotation().y();
@@ -1002,6 +1009,9 @@ void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState* gps,
     result_.grasps.clear();
     result_.energies.clear();
 
+     std::stringstream toFile; //TODO: JP edited
+     toFile.clear();
+
     ROS_INFO("Publishing Result");
     for(int i = 0; i < mPlanner->getListSize(); i++)
     {
@@ -1012,12 +1022,36 @@ void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState* gps,
         result_.grasps.push_back(g);
         result_.energies.push_back(gps->getEnergy());
         result_.search_energy = goal.search_energy;
+
+        toFile << "candidate_" << std::to_string(i) << ":\n" <<
+                 "  gripper:" << "\n" <<
+                 "    type: 1" << "\n" <<
+                 "    data: [25.0, 0.085, 0.027, 0.007, 0.027, 3]" << "\n" <<
+                 "  parent_frame_id: \"\"" << "\n" <<
+                 "  position:" << "\n" <<
+                 "    x: " <<  result_.grasps.at(i).pose.position.x << "\n" <<
+                 "    y: " <<  result_.grasps.at(i).pose.position.y  << "\n" <<
+                 "    z: " <<  result_.grasps.at(i).pose.position.z  << "\n" <<
+                 "  orientation:" << "\n" <<
+                "    x: " <<  result_.grasps.at(i).pose.orientation.x  << "\n" <<
+                "    y: " <<  result_.grasps.at(i).pose.orientation.y  << "\n" <<
+                "    z: " <<  result_.grasps.at(i).pose.orientation.z  << "\n" <<
+                "    w: " <<  result_.grasps.at(i).pose.orientation.w  << "\n" ;
     }
 
     if(mPlanner->getListSize() > 0)
     {
-        ROS_INFO("Showing Grasp 0");
+        ROS_INFO_STREAM("Showing Grasp 0. [Total: " << mPlanner->getListSize() << "]");
         mPlanner->showGrasp(0);
+
+        //TODO: remove this part from this file , JP edited
+        std::string path2candidatesFile = "/home/joaopedro/generated.yaml";
+        ROS_INFO_STREAM("Writing .yaml file at" << path2candidatesFile);
+        std::ofstream file;
+        file.open (path2candidatesFile);
+        file << toFile.str();
+        file.close();
+
     }
 
     if(mHandObjectState != NULL)
