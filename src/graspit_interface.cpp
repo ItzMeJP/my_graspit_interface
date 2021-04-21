@@ -470,13 +470,15 @@ bool GraspitInterface::setRobotDesiredDOFCB(graspit_interface::SetRobotDesiredDO
 bool GraspitInterface::importRobotCB(graspit_interface::ImportRobot::Request &request,
                        graspit_interface::ImportRobot::Response &response)
 {
+    QString filename = QString(request.filename.data());
+    /*
     QString filename = QString(getenv("GRASPIT"))+
             QString("/models/robots/") +
             QString(request.filename.data()) +
             QString("/") +
             QString(request.filename.data()) +
             QString(".xml");
-
+    */
     ROS_INFO("Loading %s",filename.toStdString().c_str());
 
     Robot * r = graspitCore->getWorld()->importRobot(filename);
@@ -501,11 +503,13 @@ bool GraspitInterface::importRobotCB(graspit_interface::ImportRobot::Request &re
 bool GraspitInterface::importObstacleCB(graspit_interface::ImportObstacle::Request &request,
                    graspit_interface::ImportObstacle::Response &response)
 {
+    QString filename = QString(request.filename.data());
+    /*
     QString filename = QString(getenv("GRASPIT"))+
             QString("/models/obstacles/") +
             QString(request.filename.data()) +
             QString(".xml");
-
+    */
     ROS_INFO("Loading %s", filename.toStdString().c_str());
 
     Body * b = graspitCore->getWorld()->importBody(QString("Body"),filename);
@@ -535,10 +539,14 @@ bool GraspitInterface::importObstacleCB(graspit_interface::ImportObstacle::Reque
 bool GraspitInterface::importGraspableBodyCB(graspit_interface::ImportGraspableBody::Request &request,
                    graspit_interface::ImportGraspableBody::Response &response)
 {
-    QString filename = QString(getenv("GRASPIT"))+
+    /*
+        QString filename = QString(getenv("GRASPIT"))+
             QString("/models/objects/") +
             QString(request.filename.data()) +
             QString(".xml");
+
+    */
+    QString filename = QString(request.filename.data());
 
     ROS_INFO("Loading %s",filename.toStdString().c_str());
     //First try to load from Graspit Directory
@@ -947,9 +955,14 @@ void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState* gps,
 
     geometry_msgs::Pose pose;
     transf t = mHand->getTran();
+    /*
     pose.position.x = t.translation().x() / 1000.0;
-    pose.position.y = t.translation().y() / 1000.0;;
-    pose.position.z = t.translation().z() / 1000.0;;
+    pose.position.y = t.translation().y() / 1000.0;
+    pose.position.z = t.translation().z() / 1000.0;
+    */
+    pose.position.x = t.translation().x() / 10000.0;
+    pose.position.y = t.translation().y() / 10000.0;
+    pose.position.z = t.translation().z() / 10000.0;
     pose.orientation.w = t.rotation().w();
     pose.orientation.x = t.rotation().x();
     pose.orientation.y = t.rotation().y();
