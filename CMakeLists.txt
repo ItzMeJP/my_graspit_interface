@@ -17,9 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-#find_package(graspit)
-#find_package(graspit EXACT REQUIRED /home/joaopedro/fromSourceTools/graspit/build/)
-#set (graspit_DIR /home/joaopedro/fromSourceTools/graspit)
+find_package(graspit)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
