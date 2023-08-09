@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-#find_package(graspit)
+find_package(graspit REQUIRED)
 #find_package(graspit EXACT REQUIRED /home/joaopedro/fromSourceTools/graspit/build/)
 #set (graspit_DIR /home/joaopedro/fromSourceTools/graspit)
 
@@ -166,8 +166,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 ## Your package locations should be listed before other locations
 include_directories(include
                     ${catkin_INCLUDE_DIRS}
-                    #${GRASPIT_INCLUDE_DIRS}
-                    /home/joaopedro/fromSourceTools/graspit/include
+                    ${GRASPIT_INCLUDE_DIRS}
+                    #$home/iilab/graspit/include
                     ${QT_INCLUDES})
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
