@@ -960,9 +960,9 @@ void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState* gps,
     pose.position.y = t.translation().y() / 1000.0;
     pose.position.z = t.translation().z() / 1000.0;
     */
-    pose.position.x = t.translation().x() / 10000.0;
-    pose.position.y = t.translation().y() / 10000.0;
-    pose.position.z = t.translation().z() / 10000.0;
+    pose.position.x = t.translation().x() / 1000.0;
+    pose.position.y = t.translation().y() / 1000.0;
+    pose.position.z = t.translation().z() / 1000.0;
     pose.orientation.w = t.rotation().w();
     pose.orientation.x = t.rotation().x();
     pose.orientation.y = t.rotation().y();
